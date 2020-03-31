@@ -18,3 +18,6 @@ ok = OkApi(access_token='token',
 
 print(ok.friends.get())
 ```
+
+* [Документация](./docs/doc.md)
+* [Примеры](./examples)
