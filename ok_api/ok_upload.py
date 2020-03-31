@@ -27,7 +27,7 @@ class Upload:
         Parameters:
             photos (str, file-object or list): Путь к изображениям или file-like объекты
             album (str, optional): Id альбома, в который добавляется фото
-            group_id (str): Id группы, в которую добавляется фото
+            group_id (str, optional): Id группы, в которую добавляется фото
             **kwargs: Дополнительные именованые аргументы (https://apiok.ru/dev/methods/rest/photosV2/photosV2.getUploadUrl)
 
         Returns:
@@ -43,19 +43,18 @@ class Upload:
         }
         params.update(kwargs)
 
-        answer = self.__ok_api.photosV2.getUploadUrl(**params)
-
-        upload_url = answer.json().get('upload_url', None)
+        answer = self.__ok_api.photosV2.getUploadUrl(**params).json()
+        upload_url = answer.get('upload_url', None)
 
         if not upload_url:
-            raise UploadPhotoError(answer.text)
+            raise UploadPhotoError(answer)
 
         with FileOpener(photos, content_type='image') as open_photos:
             req = self.__ok_api.http.post(upload_url, files=open_photos)
 
         return req.json()
 
-    def video(self, video, file_name='', **kwargs):
+    def video(self, video, file_name, **kwargs):
         """Загрузка видео
 
         Notes:
@@ -67,7 +66,7 @@ class Upload:
 
         Parameters:
             video (str or file-object): Путь к видео или file-like объект
-            file_name (str, optional): Название загружаемого файла
+            file_name (str): Название загружаемого файла
             **kwargs: Дополнительные именованые аргументы (https://apiok.ru/dev/methods/rest/video/video.getUploadUrl)
 
         Returns:
@@ -84,7 +83,7 @@ class Upload:
         upload_url = answer.get('upload_url', None)
 
         if not upload_url:
-            raise UploadVideoError(answer.text)
+            raise UploadVideoError(answer)
 
         with FileOpener(video, content_type='video') as open_video:
             req = self.__ok_api.__http.post(upload_url, files=open_video)
